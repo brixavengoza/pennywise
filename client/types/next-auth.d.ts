@@ -1,34 +1,36 @@
+import 'next-auth';
+import 'next-auth/jwt';
+
 declare module 'next-auth' {
   interface Session {
+    accessToken?: string;
+    error?: string;
+    errorType?: 'REFRESH_TOKEN_EXPIRED' | 'NO_REFRESH_TOKEN' | 'MAX_RETRIES_EXCEEDED' | 'REFRESH_FAILED';
     user: {
       id: string;
       email: string;
-      name?: string | null;
+      name: string;
     };
-    accessToken: string;
-    error?: string;
-    errorType?: 'REFRESH_TOKEN_EXPIRED' | 'NO_REFRESH_TOKEN' | 'MAX_RETRIES_EXCEEDED' | 'REFRESH_FAILED';
   }
 
   interface User {
     id: string;
     email: string;
-    name?: string | null;
-    accessToken: string;
-    refreshToken: string;
+    name: string;
+    accessToken?: string;
+    refreshToken?: string;
   }
 }
 
 declare module 'next-auth/jwt' {
   interface JWT {
-    id: string;
-    accessToken: string;
-    refreshToken: string;
+    accessToken?: string;
+    refreshToken?: string;
     accessTokenExpires?: number;
-    refreshAttempts?: number;
-    lastRefreshAttempt?: number;
     error?: string;
     errorType?: 'REFRESH_TOKEN_EXPIRED' | 'NO_REFRESH_TOKEN' | 'MAX_RETRIES_EXCEEDED' | 'REFRESH_FAILED';
+    refreshAttempts?: number;
+    lastRefreshAttempt?: number;
+    id?: string;
   }
 }
-

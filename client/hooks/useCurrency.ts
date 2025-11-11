@@ -7,6 +7,7 @@ interface CurrencyState {
   currency: Currency;
   symbol: string;
   setCurrency: (currency: Currency) => void;
+  formatAmount: (amount: number) => string;
 }
 
 const currencySymbols: Record<Currency, string> = {
@@ -18,11 +19,15 @@ const currencySymbols: Record<Currency, string> = {
 
 export const useCurrency = create<CurrencyState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       currency: 'USD',
       symbol: '$',
       setCurrency: (currency: Currency) => {
         set({ currency, symbol: currencySymbols[currency] });
+      },
+      formatAmount: (amount: number) => {
+        const { symbol } = get();
+        return `${symbol}${amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
       },
     }),
     {

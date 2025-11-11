@@ -48,9 +48,9 @@ export function IncomeExpensesChart() {
   const getMonthsToFetch = () => {
     switch (timeframe) {
       case 'weekly':
-        return 2; // 2mos to cover week data
+        return 2;
       case 'monthly':
-        return 6; // 6mos
+        return 6;
       case 'annual':
         return 12;
       default:
@@ -68,11 +68,11 @@ export function IncomeExpensesChart() {
   const getMonthsToShow = () => {
     switch (timeframe) {
       case 'weekly':
-        return 7; // Show last 7 weeks
+        return 7;
       case 'monthly':
-        return 6; // Show last 6 months
+        return 6;
       case 'annual':
-        return 12; // Show last 12 months
+        return 12;
       default:
         return 12;
     }
@@ -80,25 +80,21 @@ export function IncomeExpensesChart() {
 
   const monthsToShow = getMonthsToShow();
 
-  // Generate labels and data based on timeframe
   if (spendingTrends && spendingTrends.length > 0) {
     if (timeframe === 'weekly') {
-      // For weekly, show last 7 weeks
       for (let i = 6; i >= 0; i--) {
         const date = new Date();
-        date.setDate(date.getDate() - (i * 7)); // Go back i weeks
+        date.setDate(date.getDate() - (i * 7));
         labels.push(format(date, 'MMM d'));
         
-        // Find the month that contains this week
         const monthKey = format(date, 'yyyy-MM');
         const trend = spendingTrends.find((t: SpendingTrend) => {
           const trendMonth = new Date(t.month);
           return format(trendMonth, 'yyyy-MM') === monthKey;
         });
         
-        // For weekly, we can approximate by dividing monthly data by ~4
         if (trend) {
-          incomeData.push((trend.income || 0) / 4.33); // Approximate weekly
+          incomeData.push((trend.income || 0) / 4.33);
           expensesData.push((trend.expenses || 0) / 4.33);
         } else {
           incomeData.push(0);
@@ -106,7 +102,6 @@ export function IncomeExpensesChart() {
         }
       }
     } else {
-      // For monthly and annual, show months
       for (let i = monthsToShow - 1; i >= 0; i--) {
         const date = subMonths(new Date(), i);
         labels.push(format(date, 'MMM'));
@@ -122,7 +117,6 @@ export function IncomeExpensesChart() {
       }
     }
   } else if (!isLoading) {
-    // If no data and not loading, show empty labels
     for (let i = monthsToShow - 1; i >= 0; i--) {
       if (timeframe === 'weekly') {
         const date = new Date();
@@ -244,7 +238,6 @@ export function IncomeExpensesChart() {
         grid: {
           display: true,
           color: colors.grid,
-          lineWidth: 1,
         },
       },
       x: {
@@ -316,22 +309,7 @@ export function IncomeExpensesChart() {
       </HStack>
       <Box height="250px">
         {isLoading ? (
-          <Box height="100%" position="relative">
-            <Box position="absolute" bottom={0} left={0} right={0} height="8px" bg="bg-overlay" borderRadius="full" />
-            {labels.map((_, i) => (
-              <Box
-                key={i}
-                position="absolute"
-                bottom={0}
-                left={`${(i / (labels.length - 1 || 1)) * 100}%`}
-                width="2px"
-                height="200px"
-                bg="bg-overlay"
-                opacity={0.3}
-              />
-            ))}
-            <Skeleton height="200px" borderRadius="8px" />
-          </Box>
+          <Skeleton height="100%" borderRadius="8px" />
         ) : (
           <Line data={data} options={options} />
         )}
