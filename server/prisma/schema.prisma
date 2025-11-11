@@ -1,0 +1,111 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  // Connection pool settings for Supabase
+  // Direct connection is required for migrations
+  // Pooler connection (port 6543) can be used for regular queries but not migrations
+}
+
+model User {
+  id            String      @id @default(uuid())
+  email         String      @unique
+  name          String?
+  passwordHash  String      @map("password_hash")
+  createdAt     DateTime    @default(now()) @map("created_at")
+  updatedAt     DateTime    @updatedAt @map("updated_at")
+  
+  transactions  Transaction[]
+  budgets       Budget[]
+  goals         Goal[]
+  
+  @@map("users")
+}
+
+model Category {
+  id          String       @id @default(uuid())
+  name        String
+  type        CategoryType // INCOME or EXPENSE
+  createdAt   DateTime     @default(now()) @map("created_at")
+  updatedAt   DateTime     @updatedAt @map("updated_at")
+  
+  transactions Transaction[]
+  budgets      Budget[]
+  
+  @@unique([name, type])
+  @@map("categories")
+}
+
+model Transaction {
+  id          String       @id @default(uuid())
+  userId      String       @map("user_id")
+  categoryId  String       @map("category_id")
+  amount      Decimal      @db.Decimal(10, 2)
+  description String?
+  date        DateTime     @default(now())
+  type        TransactionType // INCOME or EXPENSE
+  createdAt   DateTime     @default(now()) @map("created_at")
+  updatedAt   DateTime     @updatedAt @map("updated_at")
+  
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category    Category     @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  
+  @@index([userId, date])
+  @@index([userId, type])
+  @@map("transactions")
+}
+
+model Budget {
+  id          String       @id @default(uuid())
+  userId      String       @map("user_id")
+  categoryId  String       @map("category_id")
+  amount      Decimal      @db.Decimal(10, 2)
+  month       Int          // 1-12
+  year        Int
+  createdAt   DateTime     @default(now()) @map("created_at")
+  updatedAt   DateTime     @updatedAt @map("updated_at")
+  
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category    Category     @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  
+  @@unique([userId, categoryId, month, year])
+  @@index([userId, year, month])
+  @@map("budgets")
+}
+
+model Goal {
+  id          String       @id @default(uuid())
+  userId      String       @map("user_id")
+  title       String
+  description String?
+  targetAmount Decimal     @db.Decimal(10, 2) @map("target_amount")
+  currentAmount Decimal    @default(0) @db.Decimal(10, 2) @map("current_amount")
+  targetDate  DateTime?    @map("target_date")
+  status      GoalStatus   @default(IN_PROGRESS)
+  createdAt   DateTime     @default(now()) @map("created_at")
+  updatedAt   DateTime     @updatedAt @map("updated_at")
+  
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId, status])
+  @@map("goals")
+}
+
+enum CategoryType {
+  INCOME
+  EXPENSE
+}
+
+enum TransactionType {
+  INCOME
+  EXPENSE
+}
+
+enum GoalStatus {
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}

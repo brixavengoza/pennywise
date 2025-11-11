@@ -1,0 +1,56 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-poppins: 'Poppins', sans-serif;
+}
+
+/* Ensure theme attribute is set on html */
+html[data-theme='light'],
+html[data-color-mode='light'] {
+  color-scheme: light;
+}
+
+html[data-theme='dark'],
+html[data-color-mode='dark'] {
+  color-scheme: dark;
+}
+
+/* Chakra UI v3 color mode support */
+[data-color-mode='dark'] {
+  color-scheme: dark;
+}
+
+[data-color-mode='light'] {
+  color-scheme: light;
+}
+
+body {
+  font-family: var(--font-poppins);
+}
+
+/* Reset for specific elements that shouldn't have border radius */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+textarea,
+select {
+  border-radius: 8px;
+}
+
+button {
+  border-radius: 8px;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}

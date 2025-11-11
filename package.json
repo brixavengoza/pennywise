@@ -1,0 +1,40 @@
+{
+  "name": "pennywise",
+  "version": "1.0.0",
+  "description": "Personal finance management application",
+  "private": true,
+  "scripts": {
+    "install:client": "cd client && npm install",
+    "install:server": "cd server && npm install",
+    "env:client": "cd client && [ ! -f .env.local ] && echo 'NEXT_PUBLIC_API_URL=http://localhost:3001' > .env.local || echo 'Client .env.local already exists'",
+    "env:server": "cd server && [ ! -f .env ] && cp env.example .env || echo 'Server .env already exists'",
+    "env:setup": "npm run env:server && npm run env:client",
+    "setup": "npm install && npm run install:client && npm run install:server && npm run env:setup && npm run db:setup",
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "dev:client": "cd client && npm run dev",
+    "dev:server": "cd server && npm run dev",
+    "build": "npm run build:server && npm run build:client",
+    "build:client": "cd client && npm run build",
+    "build:server": "cd server && npm run build",
+    "start": "concurrently \"npm run start:server\" \"npm run start:client\"",
+    "start:client": "cd client && npm run start",
+    "start:server": "cd server && npm run start",
+    "lint": "npm run lint:client && npm run lint:server",
+    "lint:client": "cd client && npm run lint",
+    "lint:server": "cd server && npm run lint",
+    "db:migrate": "cd server && npm run prisma:migrate",
+    "db:seed": "cd server && npm run prisma:seed",
+    "db:studio": "cd server && npm run prisma:studio",
+    "db:generate": "cd server && npm run prisma:generate",
+    "db:setup": "npm run db:generate && npm run db:migrate && npm run db:seed",
+    "clean": "rm -rf client/node_modules client/.next server/node_modules server/dist node_modules"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  }
+}
+
